@@ -35,8 +35,9 @@ test.describe('Passport Application E2E Tests', () => {
     test('should navigate to application form from homepage', async ({ page }) => {
         await page.goto('/');
 
-        // Click "Start Application" button
-        await page.getByRole('button', { name: /Start Application/i }).click();
+        // Click "Start Application" link
+        // Note: The button is nested inside a link, so we target the link role
+        await page.getByRole('link', { name: /Start Application/i }).click();
 
         // Verify navigation to /apply
         await expect(page).toHaveURL('/apply');
@@ -46,8 +47,11 @@ test.describe('Passport Application E2E Tests', () => {
     });
 
     test('should complete full application form with file upload', async ({ page }) => {
+        // Mark this test as slow since it involves multiple steps and file uploads
+        test.slow();
+
         // Path to the test image
-        const testImagePath = path.join(__dirname, 'fixtures/test-image.png');
+        const testImagePath = path.join(__dirname, 'fixtures/passport-sample.png');
 
         await page.goto('/apply');
 
