@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { redirect } from 'next/navigation'
 
 export async function POST(request: Request) {
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing parameters' }, { status: 400 })
         }
 
-        const { error } = await supabase
+        const { error } = await supabaseAdmin
             .from('applications')
             .update({ status })
             .eq('id', id)
@@ -30,10 +30,10 @@ export async function POST(request: Request) {
             console.error('Update error:', error)
             return NextResponse.json({ error: 'Database error' }, { status: 500 })
         }
-
-        redirect('/admin')
     } catch (error) {
         console.error('Server error:', error)
         return NextResponse.json({ error: 'Server error' }, { status: 500 })
     }
+
+    redirect('/admin')
 }

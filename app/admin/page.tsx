@@ -1,11 +1,12 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 async function getApplications() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
         .from('applications')
         .select('*')
         .order('created_at', { ascending: false })
@@ -15,7 +16,37 @@ async function getApplications() {
         return []
     }
 
-    return data || []
+    // Generate signed URLs for images
+    const applicationsWithSignedUrls = await Promise.all(
+        (data || []).map(async (app) => {
+            let passportPhotoUrl = null
+            let idPhotoUrl = null
+
+            if (app.passport_photo_path) {
+                const { data: passportData } = await supabaseAdmin
+                    .storage
+                    .from('documents')
+                    .createSignedUrl(app.passport_photo_path, 3600) // 1 hour expiry
+                passportPhotoUrl = passportData?.signedUrl
+            }
+
+            if (app.id_photo_path) {
+                const { data: idData } = await supabaseAdmin
+                    .storage
+                    .from('documents')
+                    .createSignedUrl(app.id_photo_path, 3600)
+                idPhotoUrl = idData?.signedUrl
+            }
+
+            return {
+                ...app,
+                passportPhotoUrl,
+                idPhotoUrl,
+            }
+        })
+    )
+
+    return applicationsWithSignedUrls
 }
 
 async function checkAuth() {
@@ -57,9 +88,9 @@ export default async function AdminDashboard() {
                                 <CardTitle className="flex items-center justify-between">
                                     <span>{app.full_name}</span>
                                     <span className={`rounded-full px-3 py-1 text-xs font-medium ${app.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                            app.status === 'processing' ? 'bg-blue-100 text-blue-800' :
-                                                app.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                                    'bg-red-100 text-red-800'
+                                        app.status === 'processing' ? 'bg-blue-100 text-blue-800' :
+                                            app.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                                'bg-red-100 text-red-800'
                                         }`}>
                                         {app.status}
                                     </span>
@@ -88,17 +119,31 @@ export default async function AdminDashboard() {
                                         </div>
                                     </div>
 
-                                    {app.passport_photo_path && (
+                                    {app.passportPhotoUrl && (
                                         <div className="mt-4">
-                                            <span className="font-medium">Passport Photo:</span>
-                                            <p className="text-xs text-muted-foreground">{app.passport_photo_path}</p>
+                                            <span className="font-medium block mb-2">Passport Photo:</span>
+                                            <div className="relative h-48 w-full max-w-[300px]">
+                                                <Image
+                                                    src={app.passportPhotoUrl}
+                                                    alt="Passport Photo"
+                                                    fill
+                                                    className="object-contain rounded-md border"
+                                                />
+                                            </div>
                                         </div>
                                     )}
 
-                                    {app.id_photo_path && (
-                                        <div>
-                                            <span className="font-medium">ID Photo:</span>
-                                            <p className="text-xs text-muted-foreground">{app.id_photo_path}</p>
+                                    {app.idPhotoUrl && (
+                                        <div className="mt-4">
+                                            <span className="font-medium block mb-2">ID Photo:</span>
+                                            <div className="relative h-48 w-full max-w-[300px]">
+                                                <Image
+                                                    src={app.idPhotoUrl}
+                                                    alt="ID Photo"
+                                                    fill
+                                                    className="object-contain rounded-md border"
+                                                />
+                                            </div>
                                         </div>
                                     )}
 
