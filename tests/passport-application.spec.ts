@@ -47,7 +47,7 @@ test.describe('Passport Application E2E Tests', () => {
 
     test('should complete full application form with file upload', async ({ page }) => {
         // Path to the test image
-        const testImagePath = '/Users/e4gle/Desktop/Screenshot 2025-11-10 at 16.33.16.png';
+        const testImagePath = path.join(__dirname, 'fixtures/test-image.png');
 
         await page.goto('/apply');
 
@@ -105,8 +105,10 @@ test.describe('Passport Application E2E Tests', () => {
         await idPhotoInput.setInputFiles(testImagePath);
 
         // Upload Proof of Residence
-        const proofOfResidenceInput = page.locator('input[type="file"]').nth(2);
-        await proofOfResidenceInput.setInputFiles(testImagePath);
+        // Note: Step4Photo only has 2 file inputs (Passport Photo and ID Photo), not 3.
+        // Removing the 3rd upload attempt as it doesn't exist in the component.
+        // const proofOfResidenceInput = page.locator('input[type="file"]').nth(2);
+        // await proofOfResidenceInput.setInputFiles(testImagePath);
 
         // Wait a bit for files to be processed
         await page.waitForTimeout(1000);
