@@ -65,8 +65,8 @@ export function MultiStepForm() {
             // 3. Prepare Final Data
             const finalData = {
                 ...formData,
-                passport_photo_path: passportPhotoPath,
-                id_photo_path: idPhotoPath,
+                passportPhotoPath: passportPhotoPath,
+                idPhotoPath: idPhotoPath,
                 status: 'pending'
             }
 

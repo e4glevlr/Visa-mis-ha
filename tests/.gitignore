@@ -1,0 +1,11 @@
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Screenshots from tests
+screenshots/*.png
+!screenshots/.gitkeep
+
+# Traces
+*.zip

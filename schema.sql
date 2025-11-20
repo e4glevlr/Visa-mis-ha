@@ -2,6 +2,8 @@
 alter default privileges revoke execute on functions from public;
 
 -- Create applications table
+-- Drop type if exists to avoid conflicts
+drop type if exists application_status cascade;
 create type application_status as enum ('pending', 'processing', 'completed', 'rejected');
 
 create table public.applications (
@@ -31,7 +33,7 @@ alter table public.applications enable row level security;
 create policy "Allow public insert"
 on public.applications
 for insert
-to anon
+to public
 with check (true);
 
 -- Allow admins to view all
