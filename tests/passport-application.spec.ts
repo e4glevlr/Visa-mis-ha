@@ -46,6 +46,24 @@ test.describe('Passport Application E2E Tests', () => {
     });
 
     test('should complete full application form with file upload', async ({ page }) => {
+        // Mock Supabase Storage API
+        await page.route('**/storage/v1/object/documents/**', async route => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ Key: 'documents/mock-file.png' })
+            });
+        });
+
+        // Mock Application API
+        await page.route('/api/apply', async route => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ success: true })
+            });
+        });
+
         // Path to the test image
         const testImagePath = path.join(__dirname, 'fixtures/test-image.png');
 
@@ -114,23 +132,26 @@ test.describe('Passport Application E2E Tests', () => {
         await page.waitForTimeout(1000);
 
         // Click Submit Application
+        // Handle the alert that appears on success
+        page.once('dialog', dialog => {
+            console.log(`Dialog message: ${dialog.message()}`);
+            dialog.dismiss().catch(() => {});
+        });
+
         await page.getByRole('button', { name: /Submit Application/i }).click();
 
         // ============ VERIFY SUBMISSION ============
-        // Wait for success message or redirect
-        // This depends on your implementation - adjust as needed
-        await page.waitForTimeout(2000);
+        // Since the success is shown in an alert in the current implementation (MultiStepForm.tsx),
+        // we might not see a UI change unless the form resets.
+        // The form resets step to 1 on success.
 
-        // Check if there's a success message or redirect
-        // You may need to adjust this based on your actual implementation
-        const successMessage = page.getByText(/success|submitted|thank you/i);
-        const isSuccessVisible = await successMessage.isVisible().catch(() => false);
+        // Verify we are back at Step 1 or validation of reset
+        await expect(page.getByText(/Step 1/i)).toBeVisible();
 
-        if (isSuccessVisible) {
-            console.log('✅ Application submitted successfully!');
-        } else {
-            console.log('⚠️ Submission completed, but no success message found');
-        }
+        // Verify form is cleared (optional, checking one field)
+        await expect(page.getByLabel(/Full Name/i)).toBeEmpty();
+
+        console.log('✅ Application submitted successfully!');
     });
 
     test('should navigate back and forth between form steps', async ({ page }) => {
