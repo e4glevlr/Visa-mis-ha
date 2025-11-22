@@ -30,7 +30,7 @@ export default function LandingPage() {
               Fast & Secure Passport Services
             </h1>
             <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-              Apply for your passport renewal or new application in minutes. We handle the paperwork so you don't have to.
+              Apply for your passport renewal or new application in minutes. We handle the paperwork so you don&apos;t have to.
             </p>
             <div className="space-x-4">
               <Link href="/apply">

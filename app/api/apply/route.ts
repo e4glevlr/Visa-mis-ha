@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
         // Save to Supabase
         // Map camelCase to snake_case for database
-        let query = supabaseAdmin
+        const query = supabaseAdmin
             .from('applications')
             .insert([
                 {
