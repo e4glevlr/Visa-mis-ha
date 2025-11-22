@@ -82,6 +82,7 @@ export default async function AdminDashboard() {
                         </CardContent>
                     </Card>
                 ) : (
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     applications.map((app: any) => (
                         <Card key={app.id}>
                             <CardHeader>
