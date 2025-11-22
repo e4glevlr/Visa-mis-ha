@@ -32,7 +32,7 @@ export default function AdminLogin() {
             } else {
                 setError("Invalid credentials")
             }
-        } catch (err) {
+        } catch {
             setError("An error occurred")
         } finally {
             setLoading(false)

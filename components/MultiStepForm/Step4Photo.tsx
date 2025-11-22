@@ -1,4 +1,5 @@
 import { useState } from "react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -39,10 +40,11 @@ export function Step4Photo({ onSubmit, onBack, isSubmitting }: Step4Props) {
                             <div className="flex items-center gap-4">
                                 <div className="relative flex h-32 w-32 items-center justify-center rounded-md border border-dashed border-input bg-muted">
                                     {passportPhoto ? (
-                                        <img
+                                        <Image
                                             src={URL.createObjectURL(passportPhoto)}
                                             alt="Passport Preview"
-                                            className="h-full w-full rounded-md object-cover"
+                                            fill
+                                            className="rounded-md object-cover"
                                         />
                                     ) : (
                                         <Upload className="h-8 w-8 text-muted-foreground" />
@@ -67,10 +69,11 @@ export function Step4Photo({ onSubmit, onBack, isSubmitting }: Step4Props) {
                             <div className="flex items-center gap-4">
                                 <div className="relative flex h-32 w-48 items-center justify-center rounded-md border border-dashed border-input bg-muted">
                                     {idPhoto ? (
-                                        <img
+                                        <Image
                                             src={URL.createObjectURL(idPhoto)}
                                             alt="ID Preview"
-                                            className="h-full w-full rounded-md object-cover"
+                                            fill
+                                            className="rounded-md object-cover"
                                         />
                                     ) : (
                                         <Upload className="h-8 w-8 text-muted-foreground" />
